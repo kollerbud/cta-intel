@@ -1,11 +1,11 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
+.pytest_cache/
 build/
 dist/
 wheels/
 *.egg-info
-
 
 # Virtual environments
 .venv
@@ -13,6 +13,7 @@ wheels/
 # env file
 .env
 
-# Local SQLite database
+# Local data (Parquet) and legacy SQLite artifacts
 data/
 *.db
+*.duckdb

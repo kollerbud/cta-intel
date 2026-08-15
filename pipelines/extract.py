@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 SODA_ENDPOINT = "https://data.cityofchicago.org/resource"
 DEFAULT_TIMEOUT = 60
+PAGE_SIZE = 50_000
 
 DATASET_CONFIG: dict[str, dict[str, Any]] = {
     "ridership": {
@@ -54,14 +55,12 @@ def fetch_dataset(
     order: str | None = None,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> pd.DataFrame:
-    """Return the raw rows for a SODA dataset as a DataFrame."""
+    """Return the raw rows for a SODA dataset as a DataFrame, paginating as needed."""
     params: dict[str, str] = {}
     if where:
         params["$where"] = where
     if order:
         params["$order"] = order
-    if limit is not None:
-        params["$limit"] = str(limit)
 
     headers: dict[str, str] = {}
     token = _app_token()
@@ -69,9 +68,30 @@ def fetch_dataset(
         headers["X-App-Token"] = token
 
     url = f"{SODA_ENDPOINT}/{dataset_id}.json"
-    response = requests.get(url, params=params, headers=headers, timeout=timeout)
-    response.raise_for_status()
-    records = response.json()
+
+    records: list[dict[str, Any]] = []
+    offset = 0
+    while True:
+        if limit is not None:
+            page_limit = min(PAGE_SIZE, limit - offset)
+            if page_limit <= 0:
+                break
+        else:
+            page_limit = PAGE_SIZE
+
+        params["$offset"] = str(offset)
+        params["$limit"] = str(page_limit)
+        response = requests.get(url, params=params, headers=headers, timeout=timeout)
+        response.raise_for_status()
+        page = response.json()
+        if not page:
+            break
+
+        records.extend(page)
+        if len(page) < page_limit:
+            break
+        offset += len(page)
+
     if not records:
         return pd.DataFrame()
     return pd.DataFrame.from_records(records)
