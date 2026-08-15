@@ -1,0 +1,35 @@
+[project]
+name = "cta-intel"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "lightgbm>=4.7.0",
+    "matplotlib>=3.11.1",
+    "pandas>=3.0.5",
+    "pandera>=0.32.1",
+    "plotly>=6.9.0",
+    "pytest>=9.1.1",
+    "requests>=2.34.2",
+    "scikit-learn>=1.9.0",
+    "sodapy>=2.2.0",
+    "sqlalchemy>=2.0.52",
+    "streamlit>=1.61.1",
+]
+
+[project.scripts]
+cta-intel = "cta_intel:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
