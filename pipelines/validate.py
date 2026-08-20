@@ -56,10 +56,54 @@ def _rail_entries_schema() -> pa.DataFrameSchema:
     )
 
 
+def _rail_stations_schema() -> pa.DataFrameSchema:
+    return pa.DataFrameSchema(
+        columns={
+            "station_id": pa.Column(str, nullable=False),
+            "station_name": pa.Column(str, nullable=True),
+            "station_descriptive_name": pa.Column(str, nullable=True),
+            "latitude": pa.Column(float, pa.Check.in_range(-90, 90), nullable=True),
+            "longitude": pa.Column(float, pa.Check.in_range(-180, 180), nullable=True),
+            "ada": pa.Column("boolean", nullable=True),
+            "red": pa.Column("boolean", nullable=True),
+            "blue": pa.Column("boolean", nullable=True),
+            "brn": pa.Column("boolean", nullable=True),
+            "g": pa.Column("boolean", nullable=True),
+            "o": pa.Column("boolean", nullable=True),
+            "p": pa.Column("boolean", nullable=True),
+            "pnk": pa.Column("boolean", nullable=True),
+            "y": pa.Column("boolean", nullable=True),
+            "lines": pa.Column(str, nullable=True),
+            "ward": pa.Column(int, pa.Check.ge(0), nullable=True),
+            "community_area": pa.Column(int, pa.Check.ge(0), nullable=True),
+            "zip_code": pa.Column(int, pa.Check.ge(0), nullable=True),
+        },
+        unique=["station_id"],
+        strict=True,
+    )
+
+
+def _bus_route_info_schema() -> pa.DataFrameSchema:
+    return pa.DataFrameSchema(
+        columns={
+            "route": pa.Column(str, nullable=False),
+            "route_name": pa.Column(str, nullable=True),
+            "runs_weekday": pa.Column("boolean", nullable=True),
+            "runs_saturday": pa.Column("boolean", nullable=True),
+            "runs_sunday": pa.Column("boolean", nullable=True),
+            "geometry": pa.Column(str, nullable=True),
+        },
+        unique=["route"],
+        strict=True,
+    )
+
+
 SCHEMAS: dict[str, pa.DataFrameSchema] = {
     "ridership": _ridership_schema(),
     "bus_routes": _bus_routes_schema(),
     "rail_entries": _rail_entries_schema(),
+    "rail_stations": _rail_stations_schema(),
+    "bus_route_info": _bus_route_info_schema(),
 }
 
 
